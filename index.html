@@ -1,0 +1,157 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>موقعي الحالي</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap">
+<style>
+/* Layout: one centered "shared location" card over a quiet grid ground; a full-screen black layer takes over when the button is pressed. */
+:root {
+  --bg: #eef1ee;
+  --grid: #d9dfd9;
+  --card: #ffffff;
+  --fg: #16201b;
+  --muted: #5d6b63;
+  --accent: #1f7a5a;
+  --accent-fg: #ffffff;
+  --pin: #d8432f;
+  --font: "Cairo", "Segoe UI", Tahoma, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101612; --grid: #1b241e; --card: #19211c; --fg: #eef3ef; --muted: #98a79e;
+    --accent: #3fb88a; --accent-fg: #07130d; --pin: #ff6b55; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101612; --grid: #1b241e; --card: #19211c; --fg: #eef3ef; --muted: #98a79e;
+  --accent: #3fb88a; --accent-fg: #07130d; --pin: #ff6b55; color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+  color: var(--fg);
+  font-family: var(--font);
+  direction: rtl;
+  padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; justify-content: center;
+}
+.card {
+  width: 100%; max-width: 380px; min-width: 0;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 28px 22px 22px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0,0,0,.14);
+  display: flex; flex-direction: column; align-items: center; gap: 14px;
+}
+.pin-wrap { position: relative; width: 72px; height: 72px; display: grid; place-items: center; }
+.pulse {
+  position: absolute; inset: 0; border-radius: 50%;
+  background: var(--pin); opacity: .22;
+  animation: pulse 2s ease-out infinite;
+}
+.pin { width: 34px; height: 34px; position: relative; }
+@keyframes pulse { 0% { transform: scale(.4); opacity: .45; } 100% { transform: scale(1.15); opacity: 0; } }
+h1 { margin: 0; font-size: 1.5rem; font-weight: 800; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); font-size: .95rem; line-height: 1.7; }
+.coords {
+  font-variant-numeric: tabular-nums; direction: ltr;
+  font-size: .85rem; color: var(--muted);
+  background: var(--bg); border-radius: 10px; padding: 6px 12px;
+}
+button {
+  font: inherit; font-weight: 600; font-size: 1.05rem;
+  background: var(--accent); color: var(--accent-fg);
+  border: 0; border-radius: 14px; padding: 14px 20px; width: 100%;
+  cursor: pointer;
+}
+button:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+button:active { transform: translateY(1px); }
+
+#stage {
+  position: fixed; inset: 0; background: #000; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+}
+#stage video { width: 100%; height: 100%; object-fit: contain; background: #000; }
+.end {
+  position: absolute; inset: 0; background: #000; color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; text-align: center; padding: 24px; direction: rtl;
+}
+.end strong { font-size: 1.9rem; font-weight: 800; line-height: 1.6; text-wrap: balance; }
+.end span { color: #b9c2bd; font-size: 1rem; }
+@media (prefers-reduced-motion: reduce) { .pulse { animation: none; } }
+</style>
+
+<main class="card" id="card">
+  <div class="pin-wrap" aria-hidden="true">
+    <div class="pulse"></div>
+    <svg class="pin" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z" fill="#d8432f"/>
+      <circle cx="12" cy="9" r="2.8" fill="#ffffff"/>
+    </svg>
+  </div>
+  <h1>موقعي الحالي</h1>
+  <div class="coords">30.0444° N, 31.2357° E</div>
+  <button id="open" type="button">افتح الموقع</button>
+</main>
+
+<div id="stage" hidden>
+  <video id="vid" playsinline preload="auto" src="video.mp4"></video>
+  <div class="end" id="end" hidden>
+    <strong id="endTitle">كان مقلب 😂</strong>
+    <span id="endSub">متزعلش مني</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Settings: change these two lines if you want a different ending.
+  var SHOW_END_MESSAGE = true;
+  var END_TEXT = "عليا الطلاق انت اتخضيت ي حاج بوجي 😂";
+
+  var openBtn = document.getElementById("open");
+  var stage = document.getElementById("stage");
+  var vid = document.getElementById("vid");
+  var end = document.getElementById("end");
+  document.getElementById("endTitle").textContent = END_TEXT;
+
+  function showEnd(title, sub) {
+    document.getElementById("endTitle").textContent = title;
+    document.getElementById("endSub").textContent = sub;
+    end.hidden = false;
+  }
+
+  openBtn.addEventListener("click", function () {
+    stage.hidden = false;
+    vid.muted = false;
+    vid.volume = 1;
+    var p = vid.play();
+    if (p && p.catch) {
+      p.catch(function () {
+        showEnd("الموقع غير متاح دلوقتي", "جرّب تفتح اللينك تاني بعد شوية");
+      });
+    }
+    try {
+      if (stage.requestFullscreen) stage.requestFullscreen().catch(function () {});
+    } catch (e) {}
+  });
+
+  vid.addEventListener("error", function () {
+    showEnd("الموقع غير متاح دلوقتي", "جرّب تفتح اللينك تاني بعد شوية");
+  });
+
+  vid.addEventListener("ended", function () {
+    if (SHOW_END_MESSAGE) {
+      showEnd(END_TEXT, "");
+    }
+  });
+})();
+</script>
+
+</body></html>
